@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {
     AppBar,
     Box,
@@ -14,7 +14,14 @@ import {
     Paper,
     Toolbar,
     Typography,
-    useTheme
+    useTheme,
+    Menu,
+    MenuItem,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button
 } from '@mui/material';
 import {
     Dashboard as DashboardIcon,
@@ -22,21 +29,45 @@ import {
     Person as PersonIcon,
     Settings as SettingsIcon,
 } from '@mui/icons-material';
-import RegisterForm from './user/RegisterForm';
+import RegisterForm from './auth/RegisterForm';
+import LoginForm from './auth/LoginForm';
+
+
+interface DashboardProps {
+    onLoginClick: () => void; // onLoginClick là một hàm không nhận tham số và không trả về giá trị
+}
 
 const drawerWidth = 240;
 
-const Dashboard = () => {
+const Dashboard: React.FC<DashboardProps> = ({ onLoginClick }) => {
     const [open, setOpen] = useState(true);
     const theme = useTheme();
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [openLogin, setOpenLogin] = useState(false);
 
     const toggleDrawer = () => {
         setOpen(!open);
     };
 
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleClickOpen = () => {
+        setOpenLogin(true);
+    };
+
+    const handleCloseLogin = () => {
+        setOpenLogin(false);
+    };
+
     return (
-        <Box sx={{display: 'flex'}}>
-            <AppBar position="fixed" sx={{zIndex: theme.zIndex.drawer + 1}}>
+        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+            <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }}>
                 <Toolbar>
                     <IconButton
                         color="inherit"
@@ -77,11 +108,11 @@ const Dashboard = () => {
                             </ListItemIcon>
                             <ListItemText primary="Dashboard"/>
                         </ListItemButton>
-                        <ListItemButton>
+                        <ListItemButton onClick={onLoginClick}>
                             <ListItemIcon>
                                 <PersonIcon/>
                             </ListItemIcon>
-                            <ListItemText primary="Users"/>
+                            <ListItemText primary="Login"/>
                         </ListItemButton>
                         <ListItemButton>
                             <ListItemIcon>
@@ -94,13 +125,13 @@ const Dashboard = () => {
                 </Box>
             </Drawer>
 
-            <Box component="main" sx={{flexGrow: 1, p: 3}}>
+            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
                 <Toolbar/>
-                <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
+                <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                     <Grid container spacing={3}>
                         {/* Main content */}
                         <Grid item xs={12}>
-                            <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
+                            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                                 <Typography variant="h6" gutterBottom>
                                     User Registration
                                 </Typography>
@@ -110,6 +141,18 @@ const Dashboard = () => {
                     </Grid>
                 </Container>
             </Box>
+
+            <Dialog open={openLogin} onClose={handleCloseLogin}>
+                <DialogTitle>Đăng nhập</DialogTitle>
+                <DialogContent>
+                    <LoginForm onClose={handleCloseLogin} />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseLogin} color="primary">
+                        Đóng
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };
